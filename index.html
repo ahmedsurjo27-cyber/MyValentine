@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Will You Be My Valentine? 💌</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+    }
+
+    body {
+      background-image: url('https://image2url.com/r2/default/images/1769956969185-f127588d-ae63-40dc-b773-d760184e44c5.webp');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      color: #c2185b;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.85);
+      z-index: -1;
+    }
+
+    /* ------ ENVELOPE (unchanged) ------ */
+    #envelopeScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .envelope-container {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      cursor: pointer;
+    }
+
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .envelope-body {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 150px solid transparent;
+      border-right: 150px solid transparent;
+      border-bottom: 100px solid #ff4081;
+      top: 0;
+      z-index: 2;
+    }
+
+    .envelope-flap {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 150px solid transparent;
+      border-right: 150px solid transparent;
+      border-top: 100px solid #f50057;
+      top: 0;
+      transform-origin: top;
+      transition: transform 0.8s ease;
+      z-index: 3;
+    }
+
+    .envelope.open .envelope-flap {
+      transform: rotateX(180deg);
+    }
+
+    .envelope-front {
+      position: absolute;
+      width: 300px;
+      height: 200px;
+      background: #ff4081;
+      top: 0;
+      z-index: 1;
+      border-radius: 5px;
+    }
+
+    .heart-seal {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      background: #ff1744;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: white;
+      z-index: 4;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: all 0.5s ease;
+    }
+
+    .envelope.open .heart-seal {
+      opacity: 0;
+      transform: translateX(-50%) scale(0);
+    }
+
+    .open-text {
+      margin-top: 40px;
+      color: #d81b60;
+      font-size: 1.5rem;
+      animation: pulse 2s infinite;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+
+    /* ------ MAIN CONTAINER ------ */
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(194, 24, 91, 0.3);
+      padding: 20px 25px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(255, 182, 193, 0.3);
+      display: none;
+    }
+
+    .container.show {
+      display: block;
+      animation: fadeIn 1s ease;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn 0.8s ease;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+      color: #d81b60;
+      text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      color: #5d4037;
+    }
+
+    .pet-image {
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      margin: 15px auto;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      border: 5px solid #ffcdd2;
+      object-fit: cover;
+      background-color: white;
+      display: block;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      min-width: 120px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      white-space: nowrap;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+    }
+
+    .yes-btn { background-color: #4CAF50; color: white; }
+    .yes-btn:hover { background-color: #388E3C; transform: scale(1.05); }
+    .no-btn { background-color: #f44336; color: white; }
+    .no-btn:hover { background-color: #d32f2f; transform: scale(1.05); }
+    .next-btn { background-color: #ff9800; color: white; }
+    .next-btn:hover { background-color: #f57c00; transform: scale(1.05); }
+    .try-again-btn { background-color: #9C27B0; color: white; }
+
+    .heart { color: #e91e63; font-size: 2rem; animation: heartbeat 1.5s infinite; display: inline-block; }
+    .cat-emoji { font-size: 5rem; margin: 20px 0; }
+    .angry { color: #f44336; }
+    .happy { color: #4CAF50; }
+    .love { color: #e91e63; }
+
+    .image-caption { 
+      font-style: italic; 
+      color: #757575; 
+      margin-top: 10px; 
+      font-size: 0.95rem;
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 5px 10px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      5% { transform: scale(1.2); }
+      10% { transform: scale(1.1); }
+      15% { transform: scale(1.3); }
+      50% { transform: scale(1); }
+      100% { transform: scale(1); }
+    }
+
+    /* ========== GIFT SECTION ========== */
+    .gift-collection {
+      background: linear-gradient(145deg, #fff9fb 0%, #fff0f3 100%);
+      border-radius: 40px 40px 40px 40px;
+      padding: 30px 25px;
+      margin: 30px 0;
+      border: 1px solid #ffe2e8;
+      box-shadow: 0 12px 28px rgba(233, 30, 99, 0.08);
+      position: relative;
+    }
+
+    .gift-collection::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
+      border-radius: 36px;
+      border: 1px solid rgba(255, 215, 223, 0.3);
+      pointer-events: none;
+    }
+
+    .gift-card {
+      background: white;
+      border-radius: 28px;
+      padding: 18px 22px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      box-shadow: 0 4px 14px rgba(194, 24, 91, 0.06);
+      border: 1px solid #ffe6eb;
+      transition: all 0.2s ease;
+    }
+
+    .gift-card:hover {
+      transform: translateY(-2px);
+      border-color: #ffb6c1;
+      box-shadow: 0 12px 22px rgba(233, 30, 99, 0.1);
+    }
+
+    .gift-icon {
+      font-size: 3.2rem;
+      background: #fef0f2;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #c2185b;
+      box-shadow: 0 6px 12px #ffe7ed;
+      flex-shrink: 0;
+    }
+
+    .gift-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #b33b5c;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .gift-desc {
+      font-size: 1.1rem;
+      color: #6d4c4c;
+      font-style: italic;
+      border-left: 4px solid #ff8da1;
+      padding-left: 14px;
+      margin-top: 6px;
+      background: linear-gradient(to right, #fff7f9, transparent);
+      border-radius: 0 12px 12px 0;
+    }
+
+    .gift-quote {
+      font-size: 1.1rem;
+      color: #5d4037;
+      margin: 28px 0 10px;
+      padding: 22px 18px;
+      background: #fffbfb;
+      border-radius: 24px;
+      border: 1px dashed #e7717d;
+      font-style: italic;
+      box-shadow: inset 0 1px 6px rgba(255, 205, 210, 0.3);
+      position: relative;
+    }
+
+    .gift-quote::before {
+      content: '“';
+      font-size: 4rem;
+      color: #ffb6c1;
+      position: absolute;
+      left: 6px;
+      top: -10px;
+      opacity: 0.4;
+      font-family: serif;
+    }
+
+    @media (max-width: 600px) {
+      .envelope-container {
+        width: 250px;
+        height: 170px;
+      }
+      .envelope-body {
+        border-left: 125px solid transparent;
+        border-right: 125px solid transparent;
+        border-bottom: 85px solid #ff4081;
+      }
+      .envelope-flap {
+        border-left: 125px solid transparent;
+        border-right: 125px solid transparent;
+        border-top: 85px solid #f50057;
+      }
+      .envelope-front {
+        width: 250px;
+        height: 170px;
+      }
+      .gift-title {
+        font-size: 1.4rem;
+      }
+      .gift-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- envelope screen -->
+  <div id="envelopeScreen">
+    <div class="envelope-container" onclick="openEnvelope()">
+      <div class="envelope">
+        <div class="envelope-body"></div>
+        <div class="envelope-flap"></div>
+        <div class="envelope-front"></div>
+        <div class="heart-seal">❤️</div>
+      </div>
+    </div>
+    <div class="open-text"><p>Click on the envelope to open it!</p></div>
+  </div>
+
+  <!-- main container – ALL YOUR GIFS NOW LIVE -->
+  <div class="container" id="mainContainer">
+    
+    <!-- PAGE 1 – YOUR smiling cat GIF -->
+    <div class="page active" id="page1">
+      <h1>Hey! <span class="heart">❤️</span></h1>
+      <p>I made something special for you</p>
+      <p>Do you wanna see?</p>
+      <img src="https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyZ2FyMnlhajdtZGZjd2tzZTl4MDZ0OWd3Z2QzOWMwMHNrZGN6bXRlaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/NfzERYyiWcXU4/giphy.gif" alt="Smiling happy cat" class="pet-image" style="max-width: 280px;">
+      <p class="image-caption">Click on Yes or I will tickle you :)</p>
+      <div class="buttons">
+        <button class="btn yes-btn" onclick="showPage('page3')">Yes</button>
+        <button class="btn no-btn" onclick="showPage('page2')">No</button>
+      </div>
+    </div>
+
+    <!-- PAGE 2 – YOUR angry/upset cat GIF -->
+    <div class="page" id="page2">
+      <h1>Hey! That's not nice <span class="heart angry">💔</span></h1>
+      <p>You broke my heart!</p>
+      <img src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyNDA1M2hsZXR1OTJqbjhvNGZnbHEwN3c4eHZtbDI2d3hqejUxZmt3aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wr7oA0rSjnWuiLJOY5/giphy.gif" alt="Angry upset cat" class="pet-image">
+      <p class="image-caption">How dare you click on No, BAD GIRL!</p>
+      <div class="buttons"><button class="btn try-again-btn" onclick="showPage('page1')">Try Again</button></div>
+    </div>
+
+    <!-- PAGE 3 – EXCITED CAT (still original, change if you have link) -->
+    <div class="page" id="page3">
+      <h1>Yay! <span class="heart">❤️</span></h1>
+      <p>Thank you for clicking on Yes :D</p>
+      <img src="https://media2.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" alt="Excited happy cat" class="pet-image">
+      <p class="image-caption">Now that's my good girl :></p>
+      <div class="buttons"><button class="btn next-btn" onclick="showPage('page4')">Next</button></div>
+    </div>
+
+    <!-- PAGE 4 – YOUR excited/aww cat GIF -->
+    <div class="page" id="page4">
+      <h1>So... <span class="heart">❤️</span></h1>
+      <p>There's something important I want to ask you</p>
+      <img src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUybWUxZGlib3A2cGVucHJiaTFyejVrODVpbXEyajhzb2ppenRrYmptaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ndAvMC5LFPNMCzq7m/giphy.gif" alt="Excited aww cat" class="pet-image">
+      <p class="image-caption">If you click on No then I will make it to 40 times 🌚</p>
+      <p>Will you be my Valentine?</p>
+      <div class="buttons" id="page4Buttons">
+        <button class="btn yes-btn" onclick="showPage('page6')">Yes</button>
+        <button class="btn no-btn" id="noBtn4">No</button>
+      </div>
+    </div>
+
+    <!-- PAGE 5 – YOUR cat with knife GIF -->
+    <div class="page" id="page5">
+      <h1>Wrong answer! <span class="heart angry">🔫</span></h1>
+      <p>Think again before you break my heart!</p>
+      <img src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyc3lkMzlnczE5bTJ0ZXh6NjlqaW5ocmUzNm5tcmJwbXF3MHJxa3p5YSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ueRllJW9XPUWs/giphy.gif" alt="Cat with knife" class="pet-image">
+      <p class="image-caption">I guess you wanna taste this knife</p>
+      <div class="buttons"><button class="btn try-again-btn" onclick="showPage('page4')">I'll reconsider</button></div>
+    </div>
+
+    <!-- PAGE 6 – YOUR I love you kiss cat GIF -->
+    <div class="page" id="page6">
+      <h1>You made me so happy! <span class="heart">😻</span></h1>
+      <p>My heart is filled with joy!</p>
+      <img src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUydXhycTQzYjF6ZmI2MGdoM2Z4cjFlcjYwazE2bnIxcTA5YmR2OWpycCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ANjMpBvC9LeRUopsoU/giphy.gif" alt="I love you kiss cat" class="pet-image">
+      <p class="image-caption">MWAHHHHHHHHHHHHHHHHHHHHH</p>
+      <div class="buttons"><button class="btn next-btn" onclick="showPage('page7')">Next</button></div>
+    </div>
+
+    <!-- PAGE 7 – love letter (unchanged) -->
+    <div class="page" id="page7">
+      <h1>To My Beautiful Keziah <span class="heart">❤️</span></h1>
+      <div style="background-color: rgba(252, 228, 236, 0.9); padding: 25px; border-radius: 20px; margin: 30px 0; text-align: left; border: 2px solid rgba(216, 27, 96, 0.2);">
+        <p>My banana sucker,</p>
+        <p>From the moment u came into my life, everything changed for the better. U filled my life with happiness, I never thought that I could get a girl like u. It feels like a dream that I am dating someone like u.</p>
+        <p>Ur love is the greatest gift I've ever received. Every day with u feels like a beautiful dream. U understand me in ways no one else does, u support me through everything, and u help me in my tough conditions. U make me happy just by being u.</p>
+        <p>On this Valentine's Day, I want to promise u that I will always cherish u, respect u, and love u with all my heart. U are my blessing, my safest place, and my super pretty wife. Forgive me if I ever hurt u my love.</p>
+        <p>Thank you for being u, and thank u for choosing me. I love u to infinity and beyond.</p>
+        <p>Forever yours,</p>
+        <p>Your loving Surjo <span class="heart">❤️</span></p>
+      </div>
+      <div class="cat-emoji love">🐱❤️🐶</div>
+      <p class="image-caption">You are all mine :3</p>
+      <div class="buttons"><button class="btn next-btn" onclick="showPage('page8')">See Your Gift 🎁</button></div>
+      <div style="margin-top: 30px; font-size: 1rem; color: #757575; background-color: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 10px;">
+        Made with <span class="heart">❤️</span> for the most amazing girlfriend
+      </div>
+    </div>
+
+    <!-- PAGE 8 – GIFTS (unchanged) -->
+    <div class="page" id="page8">
+      <h1>Your Virtual Valentine Gifts <span style="color: #e91e63;">🎁</span></h1>
+      <p style="font-size:1.25rem; margin-bottom: 10px;">These are small symbols of how big my love is for you.</p>
+      
+      <div class="gift-collection">
+        <div class="gift-card">
+          <div class="gift-icon">🌸</div>
+          <div style="flex:1;">
+            <div class="gift-title">Endless Flowers</div>
+            <div class="gift-desc">That will never wilt, just like my love for you</div>
+          </div>
+        </div>
+        <div class="gift-card">
+          <div class="gift-icon">🍫</div>
+          <div style="flex:1;">
+            <div class="gift-title">Sweet Chocolates</div>
+            <div class="gift-desc">As sweet as you are to me every day</div>
+          </div>
+        </div>
+        <div class="gift-card" style="margin-bottom: 0;">
+          <div class="gift-icon">💍</div>
+          <div style="flex:1;">
+            <div class="gift-title">A Forever Promise</div>
+            <div class="gift-desc">To love you with all my heart, always</div>
+          </div>
+        </div>
+        <div class="gift-quote">
+          Each gift represents a piece of my heart that I give to you today. They may be small symbols, but my love for you is infinite and everlasting.
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn start-again-btn" onclick="showPage('page1')" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">
+          Start Again ⏱️
+        </button>
+      </div>
+      <div style="margin-top: 30px; font-size: 1rem; color: #757575; background-color: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 10px;">
+        Made with <span class="heart">❤️</span> for the most amazing girlfriend
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openEnvelope() {
+      const envelope = document.querySelector('.envelope');
+      const envelopeScreen = document.getElementById('envelopeScreen');
+      const mainContainer = document.getElementById('mainContainer');
+      envelope.classList.add('open');
+      setTimeout(() => {
+        envelopeScreen.style.display = 'none';
+        mainContainer.classList.add('show');
+      }, 800);
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+
+      if (pageId === 'page4') {
+        const noBtn = document.getElementById('noBtn4');
+        if (noBtn) {
+          noBtn.style.position = '';
+          noBtn.style.left = '';
+          noBtn.style.top = '';
+          noBtn.style.transform = '';
+        }
+      }
+    }
+
+    const noBtn4 = document.getElementById('noBtn4');
+    if (noBtn4) {
+      noBtn4.addEventListener('mouseover', function(e) {
+        const buttonsContainer = document.getElementById('page4Buttons');
+        const containerRect = buttonsContainer.getBoundingClientRect();
+        const btnRect = this.getBoundingClientRect();
+
+        let maxX = containerRect.width - btnRect.width - 10;
+        let maxY = containerRect.height - btnRect.height - 10;
+        if (maxX < 0) maxX = 20;
+        if (maxY < 0) maxY = 20;
+
+        const randomX = Math.floor(Math.random() * maxX);
+        const randomY = Math.floor(Math.random() * maxY);
+
+        this.style.position = 'absolute';
+        this.style.left = randomX + 'px';
+        this.style.top = randomY + 'px';
+      });
+
+      noBtn4.addEventListener('click', function() {
+        showPage('page5');
+        this.style.position = '';
+        this.style.left = '';
+        this.style.top = '';
+      });
+    }
+  </script>
+</body>
+</html>
